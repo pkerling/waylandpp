@@ -193,7 +193,7 @@ void proxy_t::set_events(std::shared_ptr<events_base_t> events,
                          int(*dispatcher)(int, std::vector<any>, std::shared_ptr<proxy_t::events_base_t>))
 {
   // set only one time
-  if(!display && data && !data->events)
+  if(!display && !data->events)
     {
       data->events = events;
       // the dispatcher gets 'implemetation'
