@@ -114,7 +114,7 @@ namespace wayland
 
     // marshal request
     proxy_t marshal_single(uint32_t opcode, const wl_interface *interface,
-                           std::vector<detail::argument_t> v);
+                           std::vector<detail::argument_t> v, std::uint32_t version = 0);
 
   protected:
     // Interface desctiption filled in by the each interface class
@@ -134,19 +134,25 @@ namespace wayland
     void marshal(uint32_t opcode, T...args)
     {
       std::vector<detail::argument_t> v = { detail::argument_t(args)... };
-      if(c_ptr())
-        marshal_single(opcode, NULL, v);
+      marshal_single(opcode, NULL, v);
     }
 
-    // marshal a request, that leads a new proxy
+    // marshal a request that leads to a new proxy with inherited version
     template <typename...T>
     proxy_t marshal_constructor(uint32_t opcode, const wl_interface *interface,
                                 T...args)
     {
       std::vector<detail::argument_t> v = { detail::argument_t(args)... };
-      if(c_ptr())
-        return marshal_single(opcode, interface, v);
-      return proxy_t();
+      return marshal_single(opcode, interface, v);
+    }
+
+    // marshal a request that leads to a new proxy with specific version
+    template <typename...T>
+    proxy_t marshal_constructor_versioned(uint32_t opcode, const wl_interface *interface,
+                                          uint32_t version, T...args)
+    {
+      std::vector<detail::argument_t> v = { detail::argument_t(args)... };
+      return marshal_single(opcode, interface, v, version);
     }
 
     // Set the opcode for destruction of the proxy (-1 unsets it)
@@ -209,12 +215,12 @@ namespace wayland
     /** \brief Get the id of a proxy object.
         \return The id the object associated with the proxy
     */
-    uint32_t get_id();
+    uint32_t get_id() const;
 
     /** \brief Get the interface name (class) of a proxy object. 
         \return The interface name of the object associated with the proxy 
     */
-    std::string get_class();
+    std::string get_class() const;
     
     /** \brief Get the protocol object version of a proxy object.
      * 
@@ -228,7 +234,7 @@ namespace wayland
      * 
      * \return The protocol object version of the proxy or 0
      */
-    uint32_t get_version();
+    uint32_t get_version() const;
 
     /** \brief Assign a proxy to an event queue.
         \param queue The event queue that will handle this proxy 
@@ -302,7 +308,7 @@ namespace wayland
     /** \brief Check whether this intent was already finalized with \ref cancel
      * or \ref read
      */
-    bool is_finalized();
+    bool is_finalized() const;
     /** \brief Cancel read intent
      * 
      * An exception is thrown when the read intent was already finalized.
@@ -604,7 +610,7 @@ namespace wayland
         Note: Errors are fatal. If this function returns non-zero the
         display can no longer be used.
     */
-    int get_error();
+    int get_error() const;
 
     /** \brief Send all buffered requests on the display to the server. 
         \return The number of bytes sent on success or -1 on failure

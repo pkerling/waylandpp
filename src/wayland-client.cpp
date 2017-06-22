@@ -151,14 +151,19 @@ int proxy_t::c_dispatcher(const void *implementation, void *target, uint32_t opc
   return dispatcher(opcode, vargs, p.get_events());
 }
 
-proxy_t proxy_t::marshal_single(uint32_t opcode, const wl_interface *interface, std::vector<argument_t> args)
+proxy_t proxy_t::marshal_single(uint32_t opcode, const wl_interface *interface, std::vector<argument_t> args, std::uint32_t version)
 {
   std::vector<wl_argument> v;
   for(auto &arg : args)
     v.push_back(arg.argument);
   if(interface)
     {
-      wl_proxy *p = wl_proxy_marshal_array_constructor(proxy, opcode, v.data(), interface);
+      wl_proxy *p;
+      if(version > 0)
+        p = wl_proxy_marshal_array_constructor_versioned(proxy, opcode, v.data(), interface, version);
+      else
+        p = wl_proxy_marshal_array_constructor(proxy, opcode, v.data(), interface);
+
       if(!p)
         throw std::runtime_error("wl_proxy_marshal_array_constructor");
       wl_proxy_set_user_data(p, NULL); // Wayland leaves the user data uninitialized
@@ -283,17 +288,17 @@ void proxy_t::proxy_release()
 }
 
 
-uint32_t proxy_t::get_id()
+uint32_t proxy_t::get_id() const
 {
   return wl_proxy_get_id(c_ptr());
 }
 
-std::string proxy_t::get_class()
+std::string proxy_t::get_class() const
 {
   return wl_proxy_get_class(c_ptr());
 }
 
-uint32_t proxy_t::get_version()
+uint32_t proxy_t::get_version() const
 {
   return wl_proxy_get_version(c_ptr());
 }
@@ -342,7 +347,7 @@ read_intent::~read_intent()
     cancel();
 }
 
-bool read_intent::is_finalized()
+bool read_intent::is_finalized() const
 {
   return finalized;
 }
@@ -463,7 +468,7 @@ int display_t::dispatch_pending()
   return wl_display_dispatch_pending(reinterpret_cast<wl_display*>(c_ptr()));
 }    
 
-int display_t::get_error()
+int display_t::get_error() const
 {
   return wl_display_get_error(reinterpret_cast<wl_display*>(c_ptr()));
 }    
