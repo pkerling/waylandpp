@@ -28,6 +28,7 @@
 
 /** \file */
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <string>
@@ -97,7 +98,7 @@ namespace wayland
     {
       std::shared_ptr<events_base_t> events;
       int opcode; 
-      unsigned int counter;
+      std::atomic<unsigned int> counter;
     };
 
     wl_proxy *proxy = nullptr;
@@ -483,7 +484,7 @@ namespace wayland
      * auto read_intent = display.obtain_read_intent();
      * display.flush();
      * poll(fds, nfds, -1); // Custom poll() handling is possible here
-     * if (fd.revents & POLLIN)
+     * if(fd.revents & POLLIN)
      *   read_intent.read();
      * display.dispatch_pending();
      * \endcode
