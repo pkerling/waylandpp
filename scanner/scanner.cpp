@@ -66,7 +66,7 @@ struct argument_t : public element_t
     else if(type == "uint")
       return "uint32_t";
     else if(type == "fixed")
-      return "int32_t";
+      return "fixed_t";
     else if(type == "string")
       return "std::string";
     else if(type == "object")

@@ -41,12 +41,65 @@
 
 namespace wayland
 {
+  class fixed_t
+  {
+    wl_fixed_t _value = 0;
+  public:
+    fixed_t()
+    {}
+    fixed_t(int value)
+    : _value(wl_fixed_from_int(value))
+    {}
+    fixed_t(double value)
+    : _value(wl_fixed_from_double(value))
+    {}
+    static inline fixed_t from_wl_fixed(wl_fixed_t value)
+    {
+      // Extra function to not clash with int constructor (wl_fixed_t is int32_t)
+      fixed_t ret;
+      ret._value = value;
+      return ret;
+    }
+    inline wl_fixed_t value() const
+    {
+      return _value;
+    }
+    inline int as_int() const
+    {
+      return wl_fixed_to_int(_value);
+    }
+    inline double as_double() const
+    {
+      return wl_fixed_to_double(_value);
+    }
+    inline operator int() const
+    {
+      return as_int();
+    }
+    inline operator double() const
+    {
+      return as_double();
+    }
+    // Conversion to wl_fixed_t not provided since it would be ambiguous
+    // with conversion to int
+  };
+
   class proxy_t;
 
   class array_t;
 
   namespace detail
   {
+    /** \brief Check the return value of a C function and throw exception on
+     *         failure
+     *
+     * \param return_value return value of the function to check
+     * \param function_name name of the function, for error message
+     * \return return_value if it was >= 0
+     * \exception std::system_error with errno if return_value < 0
+     */
+    int check_return_value(int return_value, std::string const &function_name);
+
     /** \brief Non-refcounted wrapper for C objects
      * 
      * This is by default copyable. If this is not desired, delete the
@@ -388,9 +441,11 @@ namespace wayland
       argument_t &operator=(const argument_t &arg);
       ~argument_t();
 
-      // handles integers, file descriptors and fixed point numbers
+      // handles integers and file descriptors
       // (this works, because wl_argument is an union)
       argument_t(uint32_t i);
+      
+      argument_t(fixed_t f);
 
       // handles strings
       argument_t(std::string s);
