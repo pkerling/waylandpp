@@ -27,7 +27,6 @@
 #include <cerrno>
 #include <cstdarg>
 #include <cstdio>
-#include <iostream>
 #include <limits>
 #include <system_error>
 #include <wayland-client.hpp>
@@ -148,7 +147,6 @@ int proxy_t::c_dispatcher(const void *implementation, void *target, uint32_t opc
             else
               {
                 a = proxy_t();
-                std::cerr << "New id is empty." << std::endl;
               }
           }
           break;
