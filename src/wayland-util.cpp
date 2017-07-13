@@ -101,12 +101,6 @@ argument_t::argument_t(uint32_t i)
   is_array = false;
 }
 
-argument_t::argument_t(fixed_t f)
-{
-  argument.f = f.value();
-  is_array = false;
-}
-
 argument_t::argument_t(std::string s)
 {
   argument.s = s.c_str();

@@ -41,49 +41,6 @@
 
 namespace wayland
 {
-  class fixed_t
-  {
-    wl_fixed_t _value = 0;
-  public:
-    fixed_t()
-    {}
-    fixed_t(int value)
-    : _value(wl_fixed_from_int(value))
-    {}
-    fixed_t(double value)
-    : _value(wl_fixed_from_double(value))
-    {}
-    static inline fixed_t from_wl_fixed(wl_fixed_t value)
-    {
-      // Extra function to not clash with int constructor (wl_fixed_t is int32_t)
-      fixed_t ret;
-      ret._value = value;
-      return ret;
-    }
-    inline wl_fixed_t value() const
-    {
-      return _value;
-    }
-    inline int as_int() const
-    {
-      return wl_fixed_to_int(_value);
-    }
-    inline double as_double() const
-    {
-      return wl_fixed_to_double(_value);
-    }
-    inline operator int() const
-    {
-      return as_int();
-    }
-    inline operator double() const
-    {
-      return as_double();
-    }
-    // Conversion to wl_fixed_t not provided since it would be ambiguous
-    // with conversion to int
-  };
-
   class proxy_t;
 
   class array_t;
@@ -441,11 +398,9 @@ namespace wayland
       argument_t &operator=(const argument_t &arg);
       ~argument_t();
 
-      // handles integers and file descriptors
+      // handles integers, file descriptors and fixed point numbers
       // (this works, because wl_argument is an union)
       argument_t(uint32_t i);
-      
-      argument_t(fixed_t f);
 
       // handles strings
       argument_t(std::string s);
