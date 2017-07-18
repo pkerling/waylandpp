@@ -27,6 +27,7 @@
 #include <cerrno>
 #include <cstdarg>
 #include <cstdio>
+
 #include <limits>
 #include <system_error>
 #include <wayland-client.hpp>
@@ -48,23 +49,22 @@ void _c_log_handler(const char *format, va_list args)
   
   // Format string
   va_list args_copy;
+
   // vsnprintf consumes args, so copy beforehand
   va_copy(args_copy, args);
   int length = std::vsnprintf(nullptr, 0, format, args);
-  if (length < 0)
-  {
+  if(length < 0)
     throw std::runtime_error("Error getting length of formatted wayland-client log message");
-  }
+
   // check for possible overflow - could be done at runtime but the following should hold on all usual platforms
   static_assert(std::numeric_limits<std::vector<char>::size_type>::max() >= std::numeric_limits<int>::max() + 1u /* NUL */, "vector constructor must allow size big enough for vsnprintf return value");
+
   // for terminating NUL
   length++;
 
   std::vector<char> buf(static_cast<std::vector<char>::size_type>(length));
-  if (std::vsnprintf(buf.data(), buf.size(), format, args_copy) < 0)
-  {
+  if(std::vsnprintf(buf.data(), buf.size(), format, args_copy) < 0)
     throw std::runtime_error("Error formatting wayland-client log message");
-  }
   
   g_log_handler(buf.data());
 }
@@ -148,9 +148,7 @@ int proxy_t::c_dispatcher(const void *implementation, void *target, uint32_t opc
                 a = proxy_t(proxy);
               }
             else
-              {
-                a = proxy_t();
-              }
+              a = proxy_t();
           }
           break;
           // array
