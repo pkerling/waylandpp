@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Nils Christopher Brause
+ * Copyright (c) 2014-2017, Nils Christopher Brause
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -265,7 +265,7 @@ proxy_t &proxy_t::operator=(const proxy_t& p)
     data->counter++;
   
   // Allowed: nothing set, proxy set & data unset (for wl_display or foreign), proxy & data set (for generic wl_proxy)
-  assert((!display && !data && !proxy) || ((!display && !foreign) && data && proxy) || ((display || foreign) && !data && proxy));
+  assert((!display && !data && !proxy) || ((display || foreign) && !data && proxy) || ((!display && !foreign) && data && proxy));
 
   return *this;
 }
