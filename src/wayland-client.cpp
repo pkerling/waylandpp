@@ -267,8 +267,8 @@ proxy_t::proxy_t(wl_proxy *p, wrapper_type t, event_queue_t const &queue)
     }
 }
 
-proxy_t::proxy_t(wl_proxy *p, const proxy_t &wrapped_proxy)
-  : proxy_t(p, wrapper_type::proxy_wrapper, wrapped_proxy.data->queue)
+proxy_t::proxy_t(const proxy_t &wrapped_proxy, construct_proxy_wrapper_tag)
+  : proxy_t(static_cast<wl_proxy*> (wl_proxy_create_wrapper(wrapped_proxy.c_ptr())), wrapper_type::proxy_wrapper, wrapped_proxy.data->queue)
 {
   assert(data && !data->wrapped_proxy);
   // Need to retain a reference to the proxy this wrapper was created from:
@@ -575,12 +575,12 @@ display_t::operator wl_display*() const
   return reinterpret_cast<wl_display*>(c_ptr());
 }
 
-display_t::display_t(wl_proxy *wrapper, proxy_t const &wrapped_proxy)
-: proxy_t(wrapper, wrapped_proxy)
+display_t::display_t(proxy_t const &wrapped_proxy, construct_proxy_wrapper_tag)
+: proxy_t(wrapped_proxy, construct_proxy_wrapper_tag())
 {
 }
 
 display_t display_t::proxy_create_wrapper()
 {
-  return display_t{static_cast<wl_proxy*> (wl_proxy_create_wrapper(c_ptr())), *this};
+  return display_t{*this, construct_proxy_wrapper_tag()};
 }

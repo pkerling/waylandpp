@@ -467,7 +467,7 @@ struct interface_t : public element_t
        << std::endl
        << "  static int dispatcher(uint32_t opcode, std::vector<detail::any> args, std::shared_ptr<detail::events_base_t> e);" << std::endl
        << std::endl
-       << "  " << name << "_t(wl_proxy *wrapper, proxy_t const &wrapped_proxy);" << std::endl
+       << "  " << name << "_t(proxy_t const &wrapped_proxy, construct_proxy_wrapper_tag);" << std::endl
        << std::endl;
 
     ss << "public:" << std::endl
@@ -540,15 +540,15 @@ struct interface_t : public element_t
        << set_interface.str()
        << "}" << std::endl
        << std::endl
-       << name << "_t::" << name << "_t(wl_proxy *wrapper, proxy_t const &wrapped_proxy)" << std::endl
-       << "  : proxy_t(wrapper, wrapped_proxy)"
+       << name << "_t::" << name << "_t(proxy_t const &wrapped_proxy, construct_proxy_wrapper_tag)" << std::endl
+       << "  : proxy_t(wrapped_proxy, construct_proxy_wrapper_tag())"
        << "{" << std::endl
        << set_interface.str()
        << "}" << std::endl
        << std::endl
        << name << "_t " << name << "_t::proxy_create_wrapper()" << std::endl
        << "{" << std::endl
-       << "  return {static_cast<wl_proxy*> (wl_proxy_create_wrapper(c_ptr())), *this};" << std::endl
+       << "  return {*this, construct_proxy_wrapper_tag()};" << std::endl
        << "}" << std::endl
        << std::endl
        << "const std::string " << name << "_t::interface_name = \"" << orig_name << "\";" << std::endl

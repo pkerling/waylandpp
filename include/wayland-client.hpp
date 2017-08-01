@@ -203,8 +203,10 @@ namespace wayland
 
     // Constructs NULL proxies.
     proxy_t();
-    // Construct from proxy wrapper
-    proxy_t(wl_proxy *p, const proxy_t &wrapped_proxy);
+    
+    struct construct_proxy_wrapper_tag {};
+    // Construct from proxy as wrapper
+    proxy_t(const proxy_t &wrapped_proxy, construct_proxy_wrapper_tag);
 
   public:
     /** \brief Cronstruct a proxy_t from a wl_proxy pointer
@@ -449,8 +451,8 @@ namespace wayland
   {
   private:
     display_t(const display_t &d) { }
-    // Construct from proxy wrapper
-    display_t(wl_proxy *wrapper, proxy_t const &wrapped_proxy);
+    // Construct as proxy wrapper
+    display_t(proxy_t const &wrapped_proxy, construct_proxy_wrapper_tag);
 
   public:
     /** \brief Connect to Wayland display on an already open fd.
