@@ -24,10 +24,11 @@
  */
 
 #include <cassert>
-#include <cerrno>
 #include <cstdarg>
 #include <cstdio>
+#include <cerrno>
 
+#include <iostream>
 #include <limits>
 #include <system_error>
 #include <wayland-client.hpp>
